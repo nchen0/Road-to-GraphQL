@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+console.log("process.env is: ", process.env);
 
 const axiosGitHubGraphQL = axios.create({
   baseURL: "https://api.github.com/graphql",
@@ -10,6 +11,15 @@ const axiosGitHubGraphQL = axios.create({
 
 const TITLE = "React GraphQL GitHub Client";
 
+const GET_ORGANIZATION = `
+{
+  organization(login: "the-road-to-learn-react") {
+    name
+    url
+  }
+}
+`;
+
 class App extends React.Component {
   constructor() {
     super();
@@ -18,7 +28,9 @@ class App extends React.Component {
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    axiosGitHubGraphQL.post("", { query: GET_ORGANIZATION }).then(result => console.log(result));
+  }
 
   onChange = event => {
     event.preventDefault();
