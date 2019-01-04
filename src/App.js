@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-console.log("process.env is: ", process.env);
+import Organization from "./components/Organization";
 
 const axiosGitHubGraphQL = axios.create({
   baseURL: "https://api.github.com/graphql",
@@ -24,12 +24,16 @@ class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      path: "the-road-to-learn-react/the-road-to-learn-react"
+      path: "the-road-to-learn-react/the-road-to-learn-react",
+      organization: null,
+      errors: null
     };
   }
 
   componentDidMount() {
-    axiosGitHubGraphQL.post("", { query: GET_ORGANIZATION }).then(result => console.log(result));
+    axiosGitHubGraphQL.post("", { query: GET_ORGANIZATION }).then(result => {
+      this.setState({ organization: result.data.data.organization, errors: result.data.errors });
+    });
   }
 
   onChange = event => {
@@ -51,6 +55,11 @@ class App extends React.Component {
           <button type="submit">Search</button>
         </form>
         <hr />
+        {this.state.organization ? (
+          <Organization organization={this.state.organization} />
+        ) : (
+          <p>No information yet...</p>
+        )}
       </div>
     );
   }
