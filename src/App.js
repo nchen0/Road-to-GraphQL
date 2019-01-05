@@ -11,17 +11,17 @@ const axiosGitHubGraphQL = axios.create({
 
 const TITLE = "React GraphQL GitHub Client";
 
-const GET_ISSUES_OF_REPOS = (organization, repository) => `
-{
-  organization(login: "${organization}") {
-    name
-    url
-    repository(name: "${repository}") {
+const GET_ISSUES_OF_REPOS = `
+  query ($organization: String!, $repository: String!) {
+    organization(login: $organization) {
       name
       url
-      issues(last: 5) {
-        edges {
-          node {
+      repository(name: $repository) {
+        name
+        url
+        issues(last: 5) {
+          edges {
+            node {
             id
             title
             url
@@ -49,6 +49,7 @@ class App extends React.Component {
 
   onChange = event => {
     event.preventDefault();
+    this.setState({ path: event.target.value });
   };
 
   onSubmit = event => {
@@ -59,7 +60,10 @@ class App extends React.Component {
   onFetchFromGitHub = path => {
     const [organization, repository] = path.split("/");
     axiosGitHubGraphQL
-      .post("", { query: GET_ISSUES_OF_REPOS(organization, repository) })
+      .post("", {
+        query: GET_ISSUES_OF_REPOS,
+        variables: { organization, repository }
+      })
       .then(result => {
         console.log("result.data is: ", result.data);
         this.setState({ organization: result.data.data.organization, errors: result.data.errors });

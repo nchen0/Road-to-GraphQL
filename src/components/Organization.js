@@ -20,7 +20,7 @@ const Organization = ({ organization, errors }) => {
 
 const Repository = ({ repository }) => (
   <div>
-    <p>
+    <div>
       <strong>In Repository: </strong>
       <a href={repository.url}>{repository.name}</a>
       <ul>
@@ -32,7 +32,7 @@ const Repository = ({ repository }) => (
           );
         })}
       </ul>
-    </p>
+    </div>
   </div>
 );
 
