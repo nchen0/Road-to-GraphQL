@@ -11,12 +11,12 @@ const axiosGitHubGraphQL = axios.create({
 
 const TITLE = "React GraphQL GitHub Client";
 
-const GET_ISSUES_OF_REPOS = `
+const GET_ISSUES_OF_REPOS = (organization, repository) => `
 {
-  organization(login: "the-road-to-learn-react") {
+  organization(login: "${organization}") {
     name
     url
-    repository(name: "the-road-to-learn-react") {
+    repository(name: "${repository}") {
       name
       url
       issues(last: 5) {
@@ -44,14 +44,26 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    axiosGitHubGraphQL.post("", { query: GET_ISSUES_OF_REPOS }).then(result => {
-      console.log("result.data is: ", result.data);
-      this.setState({ organization: result.data.data.organization, errors: result.data.errors });
-    });
+    this.onFetchFromGitHub(this.state.path);
   }
 
   onChange = event => {
     event.preventDefault();
+  };
+
+  onSubmit = event => {
+    this.onFetchFromGitHub(this.state.path);
+    event.preventDefault();
+  };
+
+  onFetchFromGitHub = path => {
+    const [organization, repository] = path.split("/");
+    axiosGitHubGraphQL
+      .post("", { query: GET_ISSUES_OF_REPOS(organization, repository) })
+      .then(result => {
+        console.log("result.data is: ", result.data);
+        this.setState({ organization: result.data.data.organization, errors: result.data.errors });
+      });
   };
   render() {
     return (

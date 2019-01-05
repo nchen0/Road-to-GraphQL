@@ -21,7 +21,7 @@ const Organization = ({ organization, errors }) => {
 const Repository = ({ repository }) => (
   <div>
     <p>
-      <strong>In Repository:</strong>
+      <strong>In Repository: </strong>
       <a href={repository.url}>{repository.name}</a>
       <ul>
         {repository.issues.edges.map(issue => {
