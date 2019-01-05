@@ -12,21 +12,34 @@ const axiosGitHubGraphQL = axios.create({
 const TITLE = "React GraphQL GitHub Client";
 
 const GET_ISSUES_OF_REPOS = `
-  query ($organization: String!, $repository: String!) {
+  query ($organization: String!, $repository: String!, $cursor: String) {
     organization(login: $organization) {
       name
       url
       repository(name: $repository) {
         name
         url
-        issues(last: 5) {
+        issues(first: 5, after: $cursor, states: [OPEN]) {
           edges {
             node {
             id
             title
-            url
-          }
+            url                        
+            reactions(last: 3) {
+              edges {
+                node {
+                  id
+                  content
+                }
+              }
+            }           
+          }            
         }
+        totalCount
+pageInfo {
+endCursor
+hasNextPage
+}       
       }
     }
   }
@@ -57,17 +70,21 @@ class App extends React.Component {
     event.preventDefault();
   };
 
-  onFetchFromGitHub = path => {
+  onFetchFromGitHub = (path, cursor) => {
     const [organization, repository] = path.split("/");
     axiosGitHubGraphQL
       .post("", {
         query: GET_ISSUES_OF_REPOS,
-        variables: { organization, repository }
+        variables: { organization, repository, cursor }
       })
       .then(result => {
-        console.log("result.data is: ", result.data);
         this.setState({ organization: result.data.data.organization, errors: result.data.errors });
       });
+  };
+
+  onFetchMoreIssues = () => {
+    const { endCursor } = this.state.organization.repository.issues.pageInfo;
+    this.onFetchFromGitHub(this.state.path, endCursor);
   };
   render() {
     return (
@@ -86,7 +103,11 @@ class App extends React.Component {
         </form>
         <hr />
         {this.state.organization ? (
-          <Organization organization={this.state.organization} />
+          <Organization
+            organization={this.state.organization}
+            errors={this.state.errors}
+            onFetchMoreIssues={this.onFetchMoreIssues}
+          />
         ) : (
           <p>No information yet...</p>
         )}
