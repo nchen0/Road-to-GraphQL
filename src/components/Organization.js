@@ -10,11 +10,30 @@ const Organization = ({ organization, errors }) => {
     );
   }
   return (
-    <p>
+    <div>
       <strong>Issues from Organization: </strong>
       <a href={organization.url}>{organization.name}</a>
-    </p>
+      <Repository repository={organization.repository} />
+    </div>
   );
 };
+
+const Repository = ({ repository }) => (
+  <div>
+    <p>
+      <strong>In Repository:</strong>
+      <a href={repository.url}>{repository.name}</a>
+      <ul>
+        {repository.issues.edges.map(issue => {
+          return (
+            <li key={issue.node.id}>
+              <a href={issue.node.url}>{issue.node.title}</a>
+            </li>
+          );
+        })}
+      </ul>
+    </p>
+  </div>
+);
 
 export default Organization;
