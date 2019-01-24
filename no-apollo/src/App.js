@@ -89,7 +89,6 @@ class App extends React.Component {
     this.onFetchFromGitHub(this.state.path, endCursor);
   };
   render() {
-    console.log("this.state is: ", this.state);
     return (
       <div>
         <h1>{TITLE}</h1>
