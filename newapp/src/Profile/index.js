@@ -1,23 +1,47 @@
 import React from "react";
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
+import Loading from "../Loading";
 
 const GET_CURRENT_USER = gql`
   {
     viewer {
-      login
-      name
+      repositories(first: 5, orderBy: { direction: DESC, field: CREATED_AT }) {
+        edges {
+          node {
+            id
+            name
+            url
+            descriptionHTML
+            primaryLanguage {
+              name
+            }
+            owner {
+              login
+              url
+            }
+            stargazers {
+              totalCount
+            }
+            viewerHasStarred
+            watchers {
+              totalCount
+            }
+            viewerSubscription
+          }
+        }
+      }
     }
   }
 `;
 
 const Profile = () => (
   <Query query={GET_CURRENT_USER}>
-    {({ data }) => {
+    {({ data, loading }) => {
       console.log("data is: ", data);
       const { viewer } = data;
-      if (!viewer) {
-        return null;
+      if (loading || !viewer) {
+        return <Loading />;
       }
       return (
         <div>
